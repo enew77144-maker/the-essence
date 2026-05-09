@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-bg: 60 14% 97%;
+    --color-surface: 0 0% 100%;
+    --color-primary: 0 0% 10%;
+    --color-secondary: 0 0% 42%;
+    --color-muted: 0 0% 68%;
+    --color-border: 38 21% 89%;
+    --color-accent: 28 33% 67%;
+    --color-accent-dark: 28 24% 50%;
+    --color-success: 122 39% 49%;
+    --color-error: 0 76% 57%;
+
+    --font-heading: "Playfair Display", "EB Garamond", Georgia, serif;
+    --font-body: "Inter", "Helvetica Neue", system-ui, sans-serif;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-bg text-foreground font-body;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading tracking-tight;
+  }
+
+  ::selection {
+    background: hsl(var(--color-primary));
+    color: hsl(var(--color-surface));
+  }
+
+  /* Hide scrollbar utility */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Subtle eyebrow type */
+  .eyebrow {
+    @apply text-xs uppercase tracking-[0.18em] text-secondary;
+  }
+
+  /* Underline reveal hover */
+  .link-underline {
+    @apply relative inline-block;
+  }
+  .link-underline::after {
+    content: "";
+    @apply absolute left-0 -bottom-px h-px w-full origin-right scale-x-0 bg-current transition-transform duration-300;
+  }
+  .link-underline:hover::after {
+    @apply origin-left scale-x-100;
+  }
+}
+
+@layer components {
+  .container-tight {
+    @apply mx-auto w-full max-w-[1400px] px-4 sm:px-6 lg:px-8 xl:px-12;
+  }
+
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      hsl(var(--color-border) / 0.4) 25%,
+      hsl(var(--color-border) / 0.7) 50%,
+      hsl(var(--color-border) / 0.4) 75%
+    );
+    background-size: 200% 100%;
+    @apply animate-shimmer;
+  }
+}
