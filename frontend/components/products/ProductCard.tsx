@@ -50,7 +50,7 @@ export function ProductCard({ product }: { product: Product }) {
     >
       <Link
         href={`/products/${product.slug}`}
-        className="relative block aspect-square overflow-hidden bg-surface"
+        className="relative block aspect-square overflow-hidden bg-surface p-3"
       >
         {primary?.url ? (
           <motion.div
@@ -63,7 +63,7 @@ export function ProductCard({ product }: { product: Product }) {
               alt={primary.alt_text || product.name}
               fill
               sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-              className="object-cover"
+              className="object-contain"
             />
           </motion.div>
         ) : (
