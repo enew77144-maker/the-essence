@@ -1,6 +1,5 @@
 "use client";
 
-import { use } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 
@@ -15,9 +14,9 @@ import { queries } from "@/lib/queries";
 export default function ProductDetailPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }) {
-  const { slug } = use(params);
+  const { slug } = params;
   const { data: product, isLoading, isError } = useQuery({
     queryKey: ["product", slug],
     queryFn: () => queries.product(slug),

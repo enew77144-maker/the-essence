@@ -31,7 +31,7 @@ export function ProductImages({
             onClick={() => setActive(idx)}
             aria-label={`Show image ${idx + 1}`}
             className={cn(
-              "relative h-16 w-16 flex-none overflow-hidden border bg-surface transition",
+              "relative h-16 w-16 flex-none overflow-hidden border bg-surface p-1 transition",
               idx === active ? "border-primary" : "border-border hover:border-secondary",
             )}
           >
@@ -40,12 +40,12 @@ export function ProductImages({
               alt={img.alt_text || alt}
               fill
               sizes="64px"
-              className="object-cover"
+              className="object-contain"
             />
           </button>
         ))}
       </div>
-      <div className="relative order-1 aspect-square overflow-hidden bg-surface md:order-2">
+      <div className="relative order-1 aspect-square overflow-hidden bg-surface p-4 md:order-2">
         <AnimatePresence mode="wait">
           <motion.div
             key={main.id}
@@ -61,7 +61,7 @@ export function ProductImages({
               fill
               priority
               sizes="(min-width: 1024px) 50vw, 100vw"
-              className="object-cover"
+              className="object-contain"
             />
           </motion.div>
         </AnimatePresence>
