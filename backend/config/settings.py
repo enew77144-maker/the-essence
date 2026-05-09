@@ -163,7 +163,7 @@ SPECTACULAR_SETTINGS = {
 # CORS ------------------------------------------------------------------------
 CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = list(default_headers) + ["x-cart-session"]
+
 
 # Stripe ----------------------------------------------------------------------
 STRIPE_SECRET_KEY = env("STRIPE_SECRET_KEY", default="")
