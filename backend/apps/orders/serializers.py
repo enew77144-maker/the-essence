@@ -68,6 +68,7 @@ class CreateOrderSerializer(serializers.Serializer):
     billing_address = serializers.DictField(required=False)
     notes = serializers.CharField(required=False, allow_blank=True)
     cart_session = serializers.CharField(required=False, allow_blank=True)
+    payment_intent_id = serializers.CharField(required=False, allow_blank=True)
 
     FREE_SHIPPING_THRESHOLD = Decimal("30.00")
     BASE_SHIPPING = Decimal("4.95")
@@ -129,6 +130,7 @@ class CreateOrderSerializer(serializers.Serializer):
             shipping_address=validated_data["shipping_address"],
             billing_address=validated_data.get("billing_address", {}),
             notes=validated_data.get("notes", ""),
+            stripe_payment_intent_id=validated_data.get("payment_intent_id", ""),
         )
         for item in cart.items.all():
             primary_image = next(

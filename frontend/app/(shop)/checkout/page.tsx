@@ -73,15 +73,22 @@ export default function CheckoutPage() {
       const { data } = await api.post<{
         client_secret: string | null;
         payment_intent_id: string | null;
+        dev_mode?: boolean;
       }>("/payments/create-intent/", { email: address.email });
       setClientSecret(data.client_secret);
       setPaymentIntentId(data.payment_intent_id);
       setStep("payment");
     } catch (err) {
-      setError(
-        (err as { response?: { data?: { detail?: string } } })?.response?.data
-          ?.detail || "Could not initialize payment.",
-      );
+      const status = (err as { response?: { status?: number } })?.response?.status;
+      const detail = (err as { response?: { data?: { detail?: string } } })
+        ?.response?.data?.detail;
+      if (status === 400 && detail) {
+        setError(detail);
+      } else {
+        setError(
+          "We couldn't initialize payment. Please check your details and try again.",
+        );
+      }
     } finally {
       setPending(false);
     }
