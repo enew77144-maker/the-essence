@@ -25,6 +25,17 @@ class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
         )
 
 
+SORT_MAP: dict[str, tuple[str, ...]] = {
+    # Frontend-friendly sort tokens -> Django ORM ordering tuples.
+    "featured": ("-is_featured", "-created_at"),
+    "bestselling": ("-is_bestseller", "-rating_avg", "-created_at"),
+    "price_asc": ("price",),
+    "price_desc": ("-price",),
+    "rating": ("-rating_avg", "-created_at"),
+    "newest": ("-created_at",),
+}
+
+
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
     lookup_field = "slug"
     filterset_class = ProductFilter
@@ -41,6 +52,17 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
                 "concerns",
             )
         )
+
+    def filter_queryset(self, queryset):
+        # Run DRF's default filters (search, ordering, filterset) first, then
+        # translate our frontend-friendly ?sort= token into ORM ordering so it
+        # always wins over the default `ordering = ["-created_at"]` on the
+        # viewset.
+        queryset = super().filter_queryset(queryset)
+        sort = self.request.query_params.get("sort")
+        if sort and sort in SORT_MAP:
+            queryset = queryset.order_by(*SORT_MAP[sort])
+        return queryset
 
     def get_serializer_class(self):
         if self.action == "retrieve":
