@@ -23,6 +23,19 @@ SECRET_KEY = env("SECRET_KEY", default="dev-secret-key-change-me")
 DEBUG = env("DEBUG")
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
+# Auto-allow Render's external hostname (set automatically by Render) so the
+# deployed service doesn't 400 on the first request before ALLOWED_HOSTS is
+# updated manually.
+RENDER_EXTERNAL_HOSTNAME = env("RENDER_EXTERNAL_HOSTNAME", default="")
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS = list(ALLOWED_HOSTS) + [RENDER_EXTERNAL_HOSTNAME]
+
+CSRF_TRUSTED_ORIGINS = [
+    f"https://{host.lstrip('.')}"
+    for host in ALLOWED_HOSTS
+    if host not in ("localhost", "127.0.0.1", "*")
+]
+
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -163,17 +176,10 @@ SPECTACULAR_SETTINGS = {
 # CORS ------------------------------------------------------------------------
 CORS_ALLOWED_ORIGINS = env("CORS_ALLOWED_ORIGINS")
 CORS_ALLOW_CREDENTIALS = True
+# Keep django-cors-headers defaults (accept, authorization, content-type, dnt,
+# origin, user-agent, x-csrftoken, x-requested-with) and add x-cart-session
+# which the frontend sets to persist guest carts across requests.
 CORS_ALLOW_HEADERS = list(default_headers) + ["x-cart-session"]
-
-CORS_ALLOW_HEADERS = (
-    "accept",
-    "authorization",
-    "content-type",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
-    "x-cart-session",
-)
 
 
 # Stripe ----------------------------------------------------------------------
