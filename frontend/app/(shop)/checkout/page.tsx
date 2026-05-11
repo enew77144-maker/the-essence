@@ -99,16 +99,24 @@ export default function CheckoutPage() {
     setPending(true);
     try {
       const { data } = await api.post<{ order_number: string }>("/orders/", {
+        email: address.email,
         shipping_address: address,
         billing_address: address,
         payment_intent_id: paymentIntentId,
       });
       router.push(`/checkout/success?order=${data.order_number}`);
     } catch (err) {
-      setError(
-        (err as { response?: { data?: { detail?: string } } })?.response?.data
-          ?.detail || "Could not place order.",
-      );
+      const data = (err as { response?: { data?: Record<string, unknown> } })
+        ?.response?.data;
+      const detail = typeof data?.detail === "string" ? data.detail : null;
+      const firstFieldErr = data
+        ? Object.values(data).find((v) => Array.isArray(v) && v.length > 0)
+        : null;
+      const firstFieldMsg =
+        Array.isArray(firstFieldErr) && typeof firstFieldErr[0] === "string"
+          ? (firstFieldErr[0] as string)
+          : null;
+      setError(detail || firstFieldMsg || "Could not place order.");
     } finally {
       setPending(false);
     }
