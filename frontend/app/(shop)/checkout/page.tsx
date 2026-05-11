@@ -8,15 +8,15 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { AddressForm, emptyAddress, type AddressInput } from "@/components/checkout/AddressForm";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
-import { PaymentForm } from "@/components/checkout/PaymentForm";
+import { DevPaymentForm, PaymentForm } from "@/components/checkout/PaymentForm";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/cartStore";
 import { useAuthStore } from "@/store/authStore";
 import { api } from "@/lib/api";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, hasUsableStripeKey } from "@/lib/stripe";
 import { cn } from "@/lib/utils";
 
-const stripePromise = getStripe();
+const stripePromise = hasUsableStripeKey() ? getStripe() : null;
 
 type Step = "address" | "payment" | "review";
 const STEPS: Step[] = ["address", "payment", "review"];
@@ -73,15 +73,22 @@ export default function CheckoutPage() {
       const { data } = await api.post<{
         client_secret: string | null;
         payment_intent_id: string | null;
+        dev_mode?: boolean;
       }>("/payments/create-intent/", { email: address.email });
       setClientSecret(data.client_secret);
       setPaymentIntentId(data.payment_intent_id);
       setStep("payment");
     } catch (err) {
-      setError(
-        (err as { response?: { data?: { detail?: string } } })?.response?.data
-          ?.detail || "Could not initialize payment.",
-      );
+      const status = (err as { response?: { status?: number } })?.response?.status;
+      const detail = (err as { response?: { data?: { detail?: string } } })
+        ?.response?.data?.detail;
+      if (status === 400 && detail) {
+        setError(detail);
+      } else {
+        setError(
+          "We couldn't initialize payment. Please check your details and try again.",
+        );
+      }
     } finally {
       setPending(false);
     }
@@ -92,16 +99,24 @@ export default function CheckoutPage() {
     setPending(true);
     try {
       const { data } = await api.post<{ order_number: string }>("/orders/", {
+        email: address.email,
         shipping_address: address,
         billing_address: address,
         payment_intent_id: paymentIntentId,
       });
       router.push(`/checkout/success?order=${data.order_number}`);
     } catch (err) {
-      setError(
-        (err as { response?: { data?: { detail?: string } } })?.response?.data
-          ?.detail || "Could not place order.",
-      );
+      const data = (err as { response?: { data?: Record<string, unknown> } })
+        ?.response?.data;
+      const detail = typeof data?.detail === "string" ? data.detail : null;
+      const firstFieldErr = data
+        ? Object.values(data).find((v) => Array.isArray(v) && v.length > 0)
+        : null;
+      const firstFieldMsg =
+        Array.isArray(firstFieldErr) && typeof firstFieldErr[0] === "string"
+          ? (firstFieldErr[0] as string)
+          : null;
+      setError(detail || firstFieldMsg || "Could not place order.");
     } finally {
       setPending(false);
     }
@@ -198,7 +213,7 @@ export default function CheckoutPage() {
                       />
                     </Elements>
                   ) : (
-                    <PaymentForm
+                    <DevPaymentForm
                       pending={pending}
                       errorMessage={error}
                       onPay={async () => {
