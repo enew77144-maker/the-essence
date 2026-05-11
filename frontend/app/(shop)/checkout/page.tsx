@@ -13,10 +13,10 @@ import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/cartStore";
 import { useAuthStore } from "@/store/authStore";
 import { api } from "@/lib/api";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, hasUsableStripeKey } from "@/lib/stripe";
 import { cn } from "@/lib/utils";
 
-const stripePromise = getStripe();
+const stripePromise = hasUsableStripeKey() ? getStripe() : null;
 
 type Step = "address" | "payment" | "review";
 const STEPS: Step[] = ["address", "payment", "review"];
