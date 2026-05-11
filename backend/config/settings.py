@@ -31,6 +31,8 @@ if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS = list(ALLOWED_HOSTS) + [RENDER_EXTERNAL_HOSTNAME]
 
 CSRF_TRUSTED_ORIGINS = [
+    'https://the-essence-cosm.netlify.app',
+] + [
     f"https://{host.lstrip('.')}"
     for host in ALLOWED_HOSTS
     if host not in ("localhost", "127.0.0.1", "*")
