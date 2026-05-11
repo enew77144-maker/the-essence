@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { AddressForm, emptyAddress, type AddressInput } from "@/components/checkout/AddressForm";
 import { OrderSummary } from "@/components/checkout/OrderSummary";
-import { PaymentForm } from "@/components/checkout/PaymentForm";
+import { DevPaymentForm, PaymentForm } from "@/components/checkout/PaymentForm";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/store/cartStore";
 import { useAuthStore } from "@/store/authStore";
@@ -205,7 +205,7 @@ export default function CheckoutPage() {
                       />
                     </Elements>
                   ) : (
-                    <PaymentForm
+                    <DevPaymentForm
                       pending={pending}
                       errorMessage={error}
                       onPay={async () => {
